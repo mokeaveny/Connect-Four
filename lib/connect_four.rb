@@ -22,7 +22,10 @@ class Game
 	attr_reader :board
 	def initialize
 		@board = []
-		create_board
+		@player1 = Player.new
+		@player2 = Player.new
+		@current_player = @player1 
+		@won = false
 	end
 
 	def create_board
@@ -45,9 +48,50 @@ class Game
 	end
 
 	def turn
-		puts "Please select a number to drop your 
+		valid_choice = false
+		while valid_choice == false
+			print "Please select a number to drop your token on: "
+			column_drop = gets.chomp
+			column_drop = column_drop.to_i
+
+			if column_drop > 0 && column_drop < 8
+				valid_choice = true # They are able to place it in thay column
+				placed = false # Until the loop finds a place to put the token
+				column_drop = column_drop - 1
+				
+				while placed == false
+					for i in (5).downto(0) # Iterates downwards. Starts at 5 then goes to 0. This means it starts at the bottom of the column
+						if @board[i][column_drop] == "|   |"
+							puts @current_player.colour
+							@board[i][column_drop] = "| #{@current_player.colour} |"
+							placed = true
+							break #Has to break out of the for loop so that all of the column positions don't become that colour
+						end
+					end
+				end
+
+			end
+		end
+	end
+		
+	def change_player
+		if @current_player == @player1
+			@current_player = @player2
+		else
+			@current_player = @player1
+		end
+	end
+
+	def play
+		create_board
+		while @won == false
+			display_board
+			turn
+			change_player
+		end
+	end
 
 end	
 
 new_game = Game.new
-print(new_game.display_board)
+new_game.play
